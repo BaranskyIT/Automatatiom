@@ -1,0 +1,15 @@
+1.Локатор логотипа (html-елемент, содержащий в себе значок и слово "авиасейлс") - <'span[data-test-id="logo"]'>
+2.Локатор поля Откуда - 'input[data-test-id="origin-input"]'>
+3.Локатор поля Куда - <input[data-test-id="destination-input"]>
+4.Локатор поля Когда - <button[data-test-id="start-date-field"]>
+5.Локатор поля Обратно - <button[data-test-id="end-date-field"]>
+6.Локатор чек-бокса "Открыть Ostrovok.ru в новой вкладке" - <input[data-test-id="booking-checkbox"]>
+7.Локатор кнопки Найти билеты - <button[data-test-id="form-submit"]>
+
+1. logo = 'span[data-test-id="logo"]'
+2. otkuda = 'input[data-test-id="origin-input"]'
+3. kuda = 'input[data-test-id="destination-input"]'
+4. kogda = 'button[data-test-id="start-date-field"]'
+5. obratno = 'button[data-test-id="end-date-field"]'
+6. checkbox = 'input[data-test-id="booking-checkbox"]'
+7. n.bilet = 'button[data-test-id="form-submit"]'

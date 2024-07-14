@@ -1,0 +1,11 @@
+Локатор кнопки Войти - <div.a6.m8d_47_9 > span.d9m_47_9>
+Локатор кнопки Заказы - <a[href="/my/orderlist"] > span.tsBodyControl300XSmall>
+Локатор ссылки OZON Job (в футере) - <a[href="https://seller.ozon.ru/?utm_source=ozonru_web&utm_medium=link&utm_campaign=header_nachat_prodavat_na_ozon/"]>
+Локатор выбора валюты (верхний левый угол страницы) - <button[data-widget="selectedCurrency"] > div.ga17-a2.tsBodyControl400Small>
+Локатор выпадашки Везде (в поисковой строке) - <div.daa1_32 > span.d1aa_32.tsBody400Small>
+
+1. vhod = 'div.a6.m8d_47_9 > span.d9m_47_9'
+2. zakaz = 'a[href="/my/orderlist"] > span.tsBodyControl300XSmall'
+3. job = 'a[href="https://seller.ozon.ru/?utm_source=ozonru_web&utm_medium=link&utm_campaign=header_nachat_prodavat_na_ozon/"]'
+4. wal = 'button[data-widget="selectedCurrency"] > div.ga17-a2.tsBodyControl400Small'
+5. vezde = "div.daa1_32 > span.d1aa_32.tsBody400Small"
