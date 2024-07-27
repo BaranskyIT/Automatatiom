@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from time import sleep
 
 driver = webdriver.Chrome()
 wait = WebDriverWait(driver, 40, 0.1)
@@ -12,7 +11,6 @@ try:
     blue_button = driver.find_element(By.CSS_SELECTOR, "#ajaxButton").click()
     text_from_content = wait.until(EC.visibility_of_element_located(
         (By.CSS_SELECTOR, ".bg-success"))).text
-    sleep(2)
     print(text_from_content)
 
 except Exception as ex:
