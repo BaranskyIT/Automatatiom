@@ -56,6 +56,11 @@ def test_purchase(browser):
     postal_code = wait.until(EC.presence_of_element_located((By.ID, "postal-code")))
     postal_code.send_keys("300541")
 
+    # Проверка, что поля заполнены
+    assert first_name.get_attribute("value"), "Поле 'Имя' не заполнено"
+    assert last_name.get_attribute("value"), "Поле 'Фамилия' не заполнено"
+    assert postal_code.get_attribute("value"), "Поле 'Почтовый индекс' не заполнено"
+
     continue_button = wait.until(EC.element_to_be_clickable((By.ID, "continue")))
     continue_button.click()
     time.sleep(2)
@@ -66,10 +71,12 @@ def test_purchase(browser):
 
     total_label = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".summary_info_label.summary_total_label")))
     total_text = total_label.text
+    total_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "summary_total_label"))).text
 
     assert "Total: $58.29" in total_text, f"Expected total to be '$58.29', but got '{total_text}'"
 
     back_button = wait.until(EC.element_to_be_clickable((By.ID, "back-to-products"))).click
 
 if __name__ == "__main__":
+
     pytest.main()
