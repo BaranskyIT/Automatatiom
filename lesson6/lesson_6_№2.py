@@ -8,6 +8,11 @@ wait = WebDriverWait(driver, 40)
 
 try:
     driver.get("http://uitestingplayground.com/textinput")
+    button_name = driver.find_element(
+        "id", "newButtonName").send_keys("SkyPro")
+    confirm_button_name = driver.find_element("id", "updatingButton").click()
+    new_button_name = driver.find_element ("id", "updatingButton").text
+    print(new_button_name)
     
     input_field = wait.until(EC.presence_of_element_located((By.ID, "newButtonName")))
     input_field.send_keys("SkyPro")

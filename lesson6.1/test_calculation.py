@@ -28,3 +28,4 @@ def test_slow_calculator(browser):
 
 if __name__ == "__main__":
     pytest.main()
+

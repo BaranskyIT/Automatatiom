@@ -29,11 +29,11 @@ def test_form_submission(browser):
     }
 
     for name, value in form_data.items():
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, f'input[name="{name}"]'))).send_keys(value)
+        wait.until(EC.presence_of_element_located((By.NAME, name))).send_keys(value)
 
     wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']"))).click()
 
-    zip_code_alert = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "#zip-code")))
+    zip_code_alert = wait.until(EC.presence_of_element_located((By.ID, "zip-code")))
     assert "alert-danger" in zip_code_alert.get_attribute("class"), "Zip code alert is not highlighted in red"
 
 if __name__ == "__main__":

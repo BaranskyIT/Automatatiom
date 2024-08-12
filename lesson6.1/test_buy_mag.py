@@ -65,6 +65,12 @@ def test_purchase(browser):
     continue_button.click()
     time.sleep(2)
 
+    finish_button = wait.until(EC.element_to_be_clickable((By.ID, "finish")))
+    finish_button.click()
+    time.sleep(2)
+
+    total_label = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".summary_info_label.summary_total_label")))
+    total_text = total_label.text
     total_text = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "summary_total_label"))).text
 
     assert "Total: $58.29" in total_text, f"Expected total to be '$58.29', but got '{total_text}'"
@@ -72,4 +78,5 @@ def test_purchase(browser):
     back_button = wait.until(EC.element_to_be_clickable((By.ID, "back-to-products"))).click
 
 if __name__ == "__main__":
+
     pytest.main()
