@@ -1,69 +1,37 @@
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
-class DataBase:
+class DbEmployee:
+    scripts = {
+        "list_employee": text("select * from employee where company_id = :company_id"),
+        "new_employee": text("insert into employee (first_name, last_name, phone, is_active, company_id) values (:first_name, :last_name, :phone, :is_active, :company_id)"),
+        "id_new_employee": text("select id from employee where company_id = (select max(\"company_id\") from employee) and id = (select max(\"id\") from employee)"),
+        "delete": text("delete from employee where id = :new_id"),
+        "edit": text("update employee set first_name = :first_name, last_name = :last_name, phone = :phone, is_active = :is_active where id = :id")
+    }
 
-    def __init__(self, db_url):
-        self.engine = create_engine(db_url)
-        self.Session = sessionmaker(bind=self.engine)
-        self.session = None
-    
-    def connect(self):
-        self.session = self.Session()
-    
-    def close(self):
-        if self.session:
-            self.session.close()
-    
-    def execute_query(self, query, params=None):
-        try:
-            result = self.session.execute(text(query), params)
-            self.session.commit()
-            return result.fetchall()
-        except Exception as e:
-            print(f"Error executing query: {e}")
-            self.session.rollback()
-            self.close()
+    def __init__(self, connection_string):
+        self.__db = create_engine(connection_string)
 
-    def create_company(self, company_data):
-        query = "INSERT INTO company (id, name) VALUES (:id, :name)"
-        self.execute_query(query, company_data)
+    def get_list_employee(self, company_id):
+        with self.__db.connect() as connection:
+            result = connection.execute(self.scripts['list_employee'], {'company_id': company_id})
+            employees = result.fetchall()
+        return employees
 
-    def delete_company(self, company_id):
-        query = "DELETE FROM company WHERE id = :id"
-        self.execute_query(query, {'id': company_id})
+    def get_id_new_employee(self):
+        with self.__db.connect() as connection:
+            result = connection.execute(self.scripts['id_new_employee'])
+            db_new_employee = result.fetchone()[0]
+        return db_new_employee
 
-    def last_company_id(self):
-        query = "SELECT MAX(id) AS last_id FROM company"
-        result = self.execute_query(query)
-        return result[0]['last_id'] if result else None
+    def add_new_employee(self, first_name, last_name, phone, is_active, company_id):
+        with self.__db.connect() as connection:
+            connection.execute(self.scripts['new_employee'], {'first_name': first_name, 'last_name': last_name, 'phone': phone, 'is_active': is_active, 'company_id': company_id})
 
-    def get_list_employer(self, company_id):
-        query = "SELECT * FROM employer WHERE company_id = :company_id"
-        return self.execute_query(query, {'company_id': company_id})
+    def edit_employee(self, first_name, last_name, phone, is_active, id):
+        with self.__db.connect() as connection:
+            connection.execute(self.scripts['edit'], {'first_name': first_name, 'last_name': last_name, 'phone': phone, 'is_active': is_active, 'id': id})
 
-    def create_employer(self, employer_data):
-        query = """
-            INSERT INTO employer (first_name, last_name, middle_name, phone, email, avatar_url, company_id) 
-            VALUES (:first_name, :last_name, :middle_name, :phone, :email, :avatar_url, :company_id)
-        """
-        self.execute_query(query, employer_data)
-
-    def get_employer_id(self, email):
-        query = "SELECT id FROM employer WHERE email = :email"
-        result = self.execute_query(query, {'email': email})
-        return result[0]['id'] if result else None
-
-    def update_employer_info(self, employer_id, update_data):
-        query = """
-            UPDATE employer 
-            SET first_name = :first_name, last_name = :last_name, middle_name = :middle_name, 
-                phone = :phone, email = :email, avatar_url = :avatar_url 
-            WHERE id = :id
-        """
-        update_data['id'] = employer_id
-        self.execute_query(query, update_data)
-
-    def delete_employer(self, employer_id):
-        query = "DELETE FROM employer WHERE id = :id"
-        self.execute_query(query, {'id': employer_id})
+    def delete(self, id):
+        with self.__db.connect() as connection:
+            connection.execute(self.scripts['delete'], {'new_id': id})

@@ -1,88 +1,76 @@
-import pytest
-import requests
-from lesson9.Pages.DataBase import DataBase
-from lesson9.Pages.Employee import Employer
+from lesson9.Pages.Employee import ApiEmployee
+from lesson9.conftest import Company
+from lesson9.Pages.DataBase import DbEmployee
 
-# URL и параметры подключения
-X_client_URL = "http://example.com"
-DATABASE_URL = "postgresql+psycopg2://user:password@localhost/testdb"
+db = DbEmployee("postgresql://x_clients_user:95PM5lQE0NfzJWDQmLjbZ45ewrz1fLYa@dpg-cqsr9ulumphs73c2q40g-a.frankfurt-postgres.render.com/x_clients_db_fxd0")
 
-@pytest.mark.usefixtures("get_valid_token", "test_employee")
-def test_create_employee(get_valid_token, db):
-    token = get_valid_token
-    headers = {'Authorization': f'Bearer {token}'}
-    db_instance = DataBase(DATABASE_URL)
-    db_instance.connect()
-    
-    employer = Employer(db_instance)
-    
-    new_employee = {
-        "first_name": "New",
-        "last_name": "Employee",
-        "middle_name": "Middle",
-        "phone": "0987654321",
-        "email": "new.employee@example.com",
-        "avatar_url": "http://example.com/new_avatar.jpg",
-        "company_id": 1
-    }
-    
-    employer.add_new(new_employee)
-    emp_id = db_instance.get_employer_id(new_employee['email'])
-    
-    assert emp_id is not None
-    db_instance.close()
+company = Company("https://x-clients-be.onrender.com")
 
-@pytest.mark.usefixtures("get_valid_token", "test_employee")
-def test_get_employee(get_valid_token, db):
-    token = get_valid_token
-    headers = {'Authorization': f'Bearer {token}'}
-    db_instance = DataBase(DATABASE_URL)
-    db_instance.connect()
-    
-    employer = Employer(db_instance)
-    emp_id = db_instance.get_employer_id("test.user@example.com")
-    
-    employee_info = employer.get_info(emp_id)
-    
-    assert employee_info['email'] == "test.user@example.com"
-    db_instance.close()
+param_id = "?company=" + str(company.get_id_company())
 
-@pytest.mark.usefixtures("get_valid_token", "test_employee")
-def test_update_employee(get_valid_token, db):
-    db_instance = DataBase(DATABASE_URL)
-    db_instance.connect()
-    
-    employer = Employer(db_instance)
-    emp_id = db_instance.get_employer_id("test.user@example.com")
-    
-    updated_info = {
-        "first_name": "Updated",
-        "last_name": "User",
-        "middle_name": "NewMiddle",
-        "phone": "1112223333",
-        "email": "updated.user@example.com",
-        "avatar_url": "http://example.com/updated_avatar.jpg"
-    }
-    
-    employer.change_info(emp_id, updated_info)
-    
-    employee_info = employer.get_info(emp_id)
-    
-    assert employee_info['first_name'] == "Updated"
-    assert employee_info['email'] == "updated.user@example.com"
-    db_instance.close()
+company_id = company.get_id_company()
 
-@pytest.mark.usefixtures("get_valid_token", "test_employee")
-def test_soft_delete_employee(get_valid_token, db):
-    db_instance = DataBase(DATABASE_URL)
-    db_instance.connect()
-    
-    employer = Employer(db_instance)
-    emp_id = db_instance.get_employer_id("test.user@example.com")
-    
-    db_instance.delete_employer(emp_id)
-    
-    employee_info = employer.get_info(emp_id)
-    
-    assert employee_info is None
-    db_instance.close()
+api = ApiEmployee("https://x-clients-be.onrender.com")
+
+body = {
+      "id": 1111100011,
+      "firstName": "string",
+      "lastName": "string",
+      "middleName": "string",
+      "companyId": company_id,
+      "email": "string@bl.yu",
+      "url": "string",
+      "phone": "string",
+      "birthdate": "2023-08-14T11:02:45.622Z",
+      "isActive": "true"
+  }
+
+
+def test_get_list_employee2():
+    api_result = api.get_list_employee2(param_id)
+    api_result = api_result.json()
+    db_result = db.get_list_employee(company_id)
+    assert len(api_result) == len(db_result)
+
+
+def test_add_employee2():
+    db_result = db.get_list_employee(company_id)
+    api.add_new_employee2(body)
+    api_response = api.get_list_employee2(param_id)
+    api_response = api_response.json()
+    assert len(api_response)-len(db_result) == 1
+
+
+def test_get_new_employee2():
+    resp = api.get_list_employee2(param_id)
+    api_new_employee = resp.json()[-1]['id']
+    db_new_employee = db.get_id_new_employee()
+    assert api_new_employee == db_new_employee
+
+
+def test_create_employee():
+    db_result = db.get_list_employee(company_id)
+    db.add_new_employee("Гена", "Букин", "1234567890", True, company_id)
+    data_employee = api.get_new_employee2(db.get_id_new_employee())
+    data_employee = data_employee.json()
+    assert data_employee["firstName"] == "Гена"
+    assert data_employee["lastName"] == "Букин"
+    assert data_employee["phone"] == "1234567890"
+    assert data_employee["isActive"] == True
+    assert data_employee["companyId"] == company_id
+    id = db.get_id_new_employee()
+    db.delete(id)
+
+
+def test_edit_employee():
+    db.add_new_employee("Гена", "Букин", "1234567890", True, company_id)
+    id = db.get_id_new_employee()
+    db.edit_employee("Филипп", "Басков", "0987654321", True, id)
+    data_employee = api.get_new_employee2(id)
+    data_employee = data_employee.json()
+    assert data_employee["firstName"] == "Филипп"
+    assert data_employee["lastName"] == "Басков"
+    assert data_employee["phone"] == "0987654321"
+    assert data_employee["isActive"] == True
+    assert data_employee["companyId"] == company_id
+    db.delete(id)

@@ -1,18 +1,38 @@
-class Employer:
-    
-    def __init__(self, db_instance):
-        self.db = db_instance
-    
-    def get_list(self, company_id):
-        return self.db.get_list_employer(company_id)
-    
-    def add_new(self, employer_data):
-        self.db.create_employer(employer_data)
-    
-    def get_info(self, employer_id):
-        query = "SELECT * FROM employer WHERE id = :id"
-        result = self.db.execute_query(query, {'id': employer_id})
-        return result[0] if result else None
-    
-    def change_info(self, employer_id, update_data):
-        self.db.update_employer_info(employer_id, update_data)
+import requests
+
+
+class ApiEmployee:
+
+    def __init__(self, url) -> None:
+        self.url = url
+
+# Авторизация
+    def auth2(self, login="leonardo", password="leads"):
+        body = {
+          "username": login,
+          "password": password
+        }
+        response = requests.post(self.url + '/auth/login', json=body)
+        return response.json()["userToken"]
+
+# Получить список сотрудников компании
+    def get_list_employee2(self, params=None):
+        response = requests.get(self.url + '/employee' + params)
+        return response
+
+# Добавить нового сотрудника
+    def add_new_employee2(self, body):
+        headers = {'x-client-token': self.auth2()}
+        response = requests.post(self.url + '/employee/', headers=headers, json=body)
+        return response
+
+# Получить сотрудника по id
+    def get_new_employee2(self, id):
+        response = requests.get(self.url + '/employee/' + str(id))
+        return response
+
+# Изменить данные о новом сотруднике
+    def change_new_employee2(self, id, new_body):
+        headers = {'x-client-token': self.auth2()}
+        response = requests.patch(self.url + '/employee/' + str(id), headers=headers, json=new_body)
+        return response
