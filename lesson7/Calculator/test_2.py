@@ -1,21 +1,30 @@
-import sys
-import os
 import pytest
 from selenium import webdriver
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from lesson7.Calculator.Calmainpage import CalcMain
+import allure
 
-@pytest.fixture
-def chrome_browser():
-    driver = webdriver.Chrome()
-    yield driver
-    driver.quit()
+@allure.title("Тест результата калькулятора")
+@allure.description("Тест для проверки правильности результата калькулятора после операций")
+@allure.feature("Калькулятор")
+@allure.severity(allure.severity_level.CRITICAL)
+def test_calculator_assert(chrome_browser: webdriver.Chrome) -> None:
+    """
+    Тест на проверку правильности результата калькулятора после выполнения операций.
 
-def test_calculator_assert(chrome_browser):
-    calcmain = CalcMain(chrome_browser)
-    calcmain.insert_time()
-    calcmain.clicking_buttons()
+    Параметры:
+        chrome_browser (webdriver.Chrome): Экземпляр WebDriver Chrome.
+    """
+    with allure.step("Инициализация страницы калькулятора"):
+        calcmain = CalcMain(chrome_browser)
     
-    result = calcmain.wait_button_gettext()
-    assert "15" in result, f"Expected '15' in the result, but got '{result}'"
+    with allure.step("Установка времени задержки"):
+        calcmain.insert_time()
+    
+    with allure.step("Выполнение арифметической операции"):
+        calcmain.clicking_buttons()
+    
+    with allure.step("Ожидание и получение результата"):
+        result = calcmain.wait_button_gettext()
+    
+    with allure.step("Проверка результата"):
+        assert "15" in result, f"Ожидалось '15', но получено '{result}'"

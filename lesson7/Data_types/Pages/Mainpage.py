@@ -1,41 +1,42 @@
-# from selenium.webdriver.support import expected_conditions as EC
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.common.by import By
-# from lesson7.constants import Test_form_URL
-# from lesson7.Data_types.data import *
-import sys
-import os
-
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..'))
-if project_root not in sys.path:
-    sys.path.append(project_root)
-
-from lesson7.constants import Test_form_URL
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+from lesson7.constants import Test_form_URL
 from lesson7.Data_types.data import *
 
 class MainPage:
-    
-    def __init__(self, browser):
+    def __init__(self, browser: WebDriver) -> None:
+        """
+        Инициализация MainPage с экземпляром браузера и открытие URL формы теста.
+
+        Параметры:
+            browser (WebDriver): Экземпляр веб-драйвера.
+        """
         self.browser = browser
         self.browser.get(Test_form_URL)
+        self.find_fields()
 
-    def find_fields(self):
+    def find_fields(self) -> None:
+        """
+        Определение локаторов для полей формы.
+        """
         self._first_name = (By.NAME, "first-name")
         self._last_name = (By.NAME, "last-name")
         self._address = (By.NAME, "address")
-        self._email = (By.NAME, "e-mail") 
+        self._email = (By.NAME, "e-mail")
         self._phone = (By.NAME, "phone")
         self._zip_code = (By.NAME, "zip-code")
         self._city = (By.NAME, "city")
         self._country = (By.NAME, "country")
         self._job_position = (By.NAME, "job-position")
         self._company = (By.NAME, "company")
-        self._button = (By.TAG_NAME, "button")  # Исправлена опечатка с `_botton` на `_button`
-    
-    def filling_in_the_fields(self):
+        self._button = (By.TAG_NAME, "button")
+
+    def filling_in_the_fields(self) -> None:
+        """
+        Заполнение полей формы данными из модуля данных.
+        """
         try:
             self.browser.find_element(*self._first_name).send_keys(first_name)
             self.browser.find_element(*self._last_name).send_keys(last_name)
@@ -50,7 +51,10 @@ class MainPage:
         except Exception as e:
             print(f"Произошла ошибка при заполнении полей: {e}")
 
-    def click_submit_button(self):
+    def click_submit_button(self) -> None:
+        """
+        Нажатие кнопки отправки формы.
+        """
         try:
             WebDriverWait(self.browser, 40, poll_frequency=0.1).until(
                 EC.element_to_be_clickable(self._button)
